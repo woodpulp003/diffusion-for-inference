@@ -1,0 +1,10 @@
+# Core dependencies for Phase 1: Neural Simulator + Summary Statistics
+torch>=2.0.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+
+# Optional: Interactive development
+jupyterlab>=4.0.0
+
+
+
