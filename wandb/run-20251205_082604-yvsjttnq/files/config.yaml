@@ -1,0 +1,142 @@
+_wandb:
+    value:
+        cli_version: 0.22.2
+        e:
+            cugp9wc9svxi27jovgjtr2j9m1d4e0jy:
+                args:
+                    - --dataset_dir
+                    - data/raw/train_dataset
+                    - --num_epochs
+                    - "100"
+                    - --batch_size
+                    - "16"
+                    - --lr
+                    - "1e-4"
+                    - --T
+                    - "1000"
+                    - --schedule
+                    - cosine
+                    - --base_channels
+                    - "64"
+                    - --checkpoint_dir
+                    - checkpoints
+                    - --device
+                    - cuda
+                    - --save_every
+                    - "10"
+                    - --sample_every
+                    - "5"
+                    - --wandb
+                    - --wandb-project
+                    - diffusion-inference
+                    - --wandb-run-name
+                    - prior_diffusion_20251205_082600
+                    - --log-interval
+                    - "100"
+                codePath: training/train_prior.py
+                codePathLocal: training/train_prior.py
+                cpu_count: 64
+                cpu_count_logical: 128
+                cudaVersion: "12.4"
+                disk:
+                    /:
+                        total: "925842968576"
+                        used: "19031183360"
+                email: sahil003akhtar@gmail.com
+                executable: /home/sahil003/.pyenv/versions/miniconda3-3.10-23.10.0-1/bin/python
+                git:
+                    commit: 34db4e870160d37e39497eb658d8e8f788cb8afd
+                    remote: git@github.com:woodpulp003/diffusion-for-inference.git
+                gpu: NVIDIA L40S
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ada
+                      cudaCores: 18176
+                      memoryTotal: "48305799168"
+                      name: NVIDIA L40S
+                      uuid: GPU-d6f5f3bf-a2d7-8e97-cf7d-4adb3f39d453
+                host: node2804
+                memory:
+                    total: "1081411801088"
+                os: Linux-4.18.0-372.9.1.el8.x86_64-x86_64-with-glibc2.28
+                program: /orcd/home/002/sahil003/diffusion_inference/training/train_prior.py
+                python: CPython 3.10.18
+                root: /orcd/home/002/sahil003/diffusion_inference
+                slurm:
+                    cluster_name: eofe7
+                    conf: /etc/slurm/slurm.conf
+                    cpus_on_node: "2"
+                    gpus_on_node: "1"
+                    gtids: "0"
+                    job_account: mit_general
+                    job_cpus_per_node: "2"
+                    job_end_time: "1764955550"
+                    job_gid: "100241757"
+                    job_gpus: "1"
+                    job_id: "6938213"
+                    job_name: diffusion_prior
+                    job_nodelist: node2804
+                    job_num_nodes: "1"
+                    job_partition: mit_normal_gpu
+                    job_qos: normal
+                    job_start_time: "1764941150"
+                    job_uid: "241757"
+                    job_user: sahil003
+                    jobid: "6938213"
+                    localid: "0"
+                    mem_per_node: "10240"
+                    nnodes: "1"
+                    nodeid: "0"
+                    nodelist: node2804
+                    nprocs: "2"
+                    ntasks: "2"
+                    oom_kill_step: "0"
+                    prio_process: "0"
+                    procid: "0"
+                    script_context: prolog_task
+                    submit_dir: /orcd/home/002/sahil003/diffusion_inference
+                    submit_host: eosloan
+                    task_pid: "2303768"
+                    tasks_per_node: "2"
+                    topology_addr: node2804
+                    topology_addr_pattern: node
+                startedAt: "2025-12-05T13:26:04.045073Z"
+                writerId: cugp9wc9svxi27jovgjtr2j9m1d4e0jy
+        m: []
+        python_version: 3.10.18
+        t:
+            "1":
+                - 1
+                - 105
+            "2":
+                - 1
+                - 105
+            "3":
+                - 2
+                - 13
+                - 16
+            "4": 3.10.18
+            "5": 0.22.2
+            "12": 0.22.2
+            "13": linux-x86_64
+T:
+    value: 1000
+base_channels:
+    value: 64
+batch_size:
+    value: 16
+channel_multipliers:
+    value:
+        - 1
+        - 2
+        - 4
+dataset_dir:
+    value: data/raw/train_dataset
+device:
+    value: cuda
+lr:
+    value: 0.0001
+num_epochs:
+    value: 100
+schedule:
+    value: cosine

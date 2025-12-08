@@ -1,0 +1,57 @@
+======== Diffusion Prior Training ========
+Job ID: 6938184
+Node: node1634
+GPU requested: 1 x L40s
+Start time: Fri Dec  5 08:18:48 EST 2025
+
+Error while loading conda entry point: conda-libmamba-solver (module 'libmambapy' has no attribute 'QueryFormat')
+Environment: megagem
+Python: /orcd/home/002/sahil003/diffusion_inference/.venv/bin/python
+Python version: Python 3.6.8
+
+Testing GPU availability...
+/orcd/home/002/sahil003/diffusion_inference/.venv/lib64/python3.6/site-packages/torch/cuda/__init__.py:143: UserWarning: 
+NVIDIA L40S with CUDA capability sm_89 is not compatible with the current PyTorch installation.
+The current PyTorch install supports CUDA capabilities sm_37 sm_50 sm_60 sm_70.
+If you want to use the NVIDIA L40S GPU with PyTorch, please check the instructions at https://pytorch.org/get-started/locally/
+
+  warnings.warn(incompatible_device_warn.format(device_name, capability, " ".join(arch_list), device_name))
+PyTorch version: 1.10.2+cu102
+CUDA available: True
+GPU count: 1
+GPU name: NVIDIA L40S
+GPU memory: 47.80 GB
+
+======== Starting Diffusion Prior Training ========
+Model: Unconditional DDPM over weight matrices
+Architecture: UNet with time conditioning
+W&B Project: diffusion-inference
+
+/orcd/home/002/sahil003/diffusion_inference/.venv/lib64/python3.6/site-packages/torch/cuda/__init__.py:143: UserWarning: 
+NVIDIA L40S with CUDA capability sm_89 is not compatible with the current PyTorch installation.
+The current PyTorch install supports CUDA capabilities sm_37 sm_50 sm_60 sm_70.
+If you want to use the NVIDIA L40S GPU with PyTorch, please check the instructions at https://pytorch.org/get-started/locally/
+
+  warnings.warn(incompatible_device_warn.format(device_name, capability, " ".join(arch_list), device_name))
+Warning: wandb not available. Install with: pip install wandb
+Using device: cuda
+GPU: NVIDIA L40S
+CUDA version: 10.2
+Warning: wandb requested but not available. Continuing without logging.
+Loaded 1000 networks from data/raw/train_dataset
+Network size: N = 50
+Epoch 1/100:   0%|          | 0/63 [00:00<?, ?it/s]Epoch 1/100:   0%|          | 0/63 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "training/train_prior.py", line 360, in <module>
+    log_interval=args.log_interval,
+  File "training/train_prior.py", line 174, in train
+    loss = diffusion.p_losses(W)
+  File "./models/diffusion_prior/prior_diffusion.py", line 89, in p_losses
+    t = torch.randint(0, self.T, (B,), device=W0.device)
+RuntimeError: CUDA error: no kernel image is available for execution on the device
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+======== Training Completed ========
+End time: Fri Dec  5 08:19:01 EST 2025
+Checkpoints saved to: checkpoints/

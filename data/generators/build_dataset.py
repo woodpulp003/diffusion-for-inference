@@ -17,8 +17,8 @@ import torch
 from typing import Optional
 from tqdm import tqdm
 
-from generate_weights import sample_weight_matrix
-from simulate_activity import generate_activity_trials
+from data.generators.generate_weights import sample_weight_matrix
+from data.generators.simulate_activity import generate_activity_trials
 
 
 def build_dataset(

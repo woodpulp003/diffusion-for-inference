@@ -19,7 +19,6 @@ from data.generators.generate_weights import (
 from data.generators.simulate_activity import (
     generate_activity_trials,
     generate_activity_trials_batched,
-    compute_trial_summary,
 )
 from data.generators.build_dataset import (
     build_dataset,
@@ -36,7 +35,6 @@ __all__ = [
     # Activity simulation
     "generate_activity_trials",
     "generate_activity_trials_batched",
-    "compute_trial_summary",
     # Dataset building
     "build_dataset",
     "load_network",
