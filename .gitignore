@@ -28,6 +28,8 @@ data/raw/**/*.pt
 
 # Experiment artifacts
 checkpoints/
+checkpoints_cfg/
+checkpoints_cfg_v2/
 wandb/
 slurm-*.out
 
