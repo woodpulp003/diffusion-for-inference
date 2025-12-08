@@ -26,6 +26,11 @@ Thumbs.db
 data/raw/**/*.pt
 !data/raw/**/metadata.pt
 
+# Experiment artifacts
+checkpoints/
+wandb/
+slurm-*.out
+
 # Jupyter
 .ipynb_checkpoints/
 *.ipynb
