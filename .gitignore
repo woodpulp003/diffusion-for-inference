@@ -44,3 +44,4 @@ slurm-*.out
 *.tmp
 *.bak
 
+prior_samples.pt

@@ -218,7 +218,7 @@ def simulate_activity_for_comparison(
     Simulate activity from weight matrix for functional comparison.
     
     Returns:
-        A: [num_trials, T, N] average activity across trials
+        A: [T, N] average activity across trials
     """
     if seed is not None:
         torch.manual_seed(seed)
@@ -238,6 +238,23 @@ def simulate_activity_for_comparison(
     return A_avg
 
 
+def autocorr_1d(x: torch.Tensor) -> torch.Tensor:
+    """Compute normalized autocorrelation for 1D signal."""
+    x = x - x.mean()
+    if x.numel() < 2:
+        return torch.tensor([1.0], device=x.device, dtype=x.dtype)
+    n = x.numel()
+    # full autocorr using convolution with reversed signal
+    corr_full = torch.nn.functional.conv1d(
+        x.view(1, 1, -1), x.flip(0).view(1, 1, -1), padding=n - 1
+    ).flatten()  # length 2*n - 1
+    # keep non-negative lags: length n, starting at lag 0
+    corr = corr_full[n - 1:]
+    # normalize by zero-lag value to get correlation-like scale
+    corr = corr / corr[0].clamp(min=1e-8)
+    return corr
+
+
 def compute_activity_similarity(
     W_pred: torch.Tensor,
     W_true: torch.Tensor,
@@ -249,11 +266,11 @@ def compute_activity_similarity(
     Compute functional similarity by simulating activity.
     
     Returns:
-        Dict with 'mse_rate', 'corr_rate', 'mse_autocorr', 'corr_autocorr'
+        Dict with mse/corr over rates, variance, full activity, and autocorr correlation.
     """
     # Simulate activities
-    A_pred = simulate_activity_for_comparison(W_pred, T, dt, tau, seed=42)
-    A_true = simulate_activity_for_comparison(W_true, T, dt, tau, seed=42)
+    A_pred = simulate_activity_for_comparison(W_pred, T, dt, tau, seed=42)  # [T, N]
+    A_true = simulate_activity_for_comparison(W_true, T, dt, tau, seed=42)  # [T, N]
     
     # Time-averaged firing rates
     rate_pred = A_pred.mean(dim=0)  # [N]
@@ -262,14 +279,32 @@ def compute_activity_similarity(
     mse_rate = ((rate_pred - rate_true) ** 2).mean().item()
     corr_rate = compute_pearsonr(rate_pred.cpu().numpy(), rate_true.cpu().numpy())
     
-    # Autocorrelation (simplified: variance of activity)
-    var_pred = A_pred.var(dim=0).mean().item()
-    var_true = A_true.var(dim=0).mean().item()
+    # Variance per neuron
+    var_pred = A_pred.var(dim=0)  # [N]
+    var_true = A_true.var(dim=0)  # [N]
+    var_mse_per_neuron = ((var_pred - var_true) ** 2).mean().item()
+    
+    # Full activity MSE
+    mse_activity = ((A_pred - A_true) ** 2).mean().item()
+    
+    # Autocorrelation similarity (mean over neurons)
+    autocorr_corr_list = []
+    for n in range(A_pred.shape[1]):
+        ac_pred = autocorr_1d(A_pred[:, n])
+        ac_true = autocorr_1d(A_true[:, n])
+        min_len = min(ac_pred.numel(), ac_true.numel())
+        c = compute_pearsonr(
+            ac_pred[:min_len].cpu().numpy(), ac_true[:min_len].cpu().numpy()
+        )
+        autocorr_corr_list.append(c)
+    autocorr_corr = float(np.mean(autocorr_corr_list))
     
     return {
-        'mse_rate': mse_rate,
+        'mse_rate': float(mse_rate),
         'corr_rate': float(corr_rate),
-        'mse_var': abs(var_pred - var_true),
+        'mse_activity': float(mse_activity),
+        'var_mse_per_neuron': float(var_mse_per_neuron),
+        'autocorr_corr': float(autocorr_corr),
     }
 
 
@@ -357,6 +392,12 @@ def print_metrics_summary(
     if 'mse_rate' in metrics_cond:
         print(f"  Activity rate MSE:        {metrics_cond['mse_rate']:.6f}")
         print(f"  Activity rate correlation: {metrics_cond['corr_rate']:.6f}")
+    if 'mse_activity' in metrics_cond:
+        print(f"  Activity MSE:             {metrics_cond['mse_activity']:.6f}")
+    if 'var_mse_per_neuron' in metrics_cond:
+        print(f"  Activity variance MSE:    {metrics_cond['var_mse_per_neuron']:.6f}")
+    if 'autocorr_corr' in metrics_cond:
+        print(f"  Autocorr correlation:     {metrics_cond['autocorr_corr']:.6f}")
     
     if metrics_prior:
         print("\nBaseline (Unconditional Prior):")
@@ -428,6 +469,8 @@ def main(
     W_pred_cond_list = []
     W_pred_prior_list = []
     A_conditioning_list = []
+    A_pred_sim_list = []
+    A_true_sim_list = []
     
     with torch.no_grad():
         for i in range(num_eval):
@@ -471,6 +514,12 @@ def main(
                     W_pred_cond, W_true, T_sim, dt, tau
                 )
                 metrics_cond.update(activity_metrics)
+                
+                # Store simulated activities
+                A_pred_sim = simulate_activity_for_comparison(W_pred_cond, T_sim, dt, tau, seed=42)
+                A_true_sim = simulate_activity_for_comparison(W_true, T_sim, dt, tau, seed=42)
+                A_pred_sim_list.append(A_pred_sim.cpu())
+                A_true_sim_list.append(A_true_sim.cpu())
             
             metrics_cond_list.append(metrics_cond)
             
@@ -527,7 +576,7 @@ def main(
     W_pred_cond_stack = torch.stack(W_pred_cond_list, dim=0)  # [num_eval, N, N]
     A_conditioning_stack = torch.stack(A_conditioning_list, dim=0)  # [num_eval, T, N_obs]
     
-    # Save conditional predictions
+    # Save conditional predictions (and simulated activities if available)
     torch.save({
         'W_true': W_true_stack,
         'W_pred_cond': W_pred_cond_stack,
@@ -549,6 +598,14 @@ def main(
             'num_samples': num_samples,
         }, output_path / 'unconditional_predictions.pt')
         print(f"  Saved unconditional predictions to {output_path / 'unconditional_predictions.pt'}")
+
+    # Save simulated activities if computed
+    if simulate_activity and len(A_pred_sim_list) > 0 and len(A_true_sim_list) > 0:
+        torch.save({
+            'A_true_sim': torch.stack(A_true_sim_list, dim=0),
+            'A_pred_sim': torch.stack(A_pred_sim_list, dim=0),
+        }, output_path / 'simulated_activities.pt')
+        print(f"  Saved simulated activities to {output_path / 'simulated_activities.pt'}")
     
     # Save metrics
     torch.save({

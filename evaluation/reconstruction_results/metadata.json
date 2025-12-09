@@ -1,0 +1,15 @@
+{
+  "cond_checkpoint": "checkpoints_cfg_v2/cfg_epoch_1000.pt",
+  "prior_checkpoint": "checkpoints/prior_diffusion_epoch_100.pt",
+  "dataset_dir": "data/raw/train_dataset",
+  "num_eval": 50,
+  "num_samples": 4,
+  "guidance_scale": 1.5,
+  "activity_mode": "first_trial",
+  "aggregate": "mean",
+  "simulate_activity": true,
+  "N": 50,
+  "n_obs": 50,
+  "T": 1000,
+  "d_model": 128
+}
