@@ -32,6 +32,7 @@ checkpoints_cfg/
 checkpoints_cfg_v2/
 wandb/
 slurm-*.out
+evaluation/reconstruction_results/*.pt
 
 # Jupyter
 .ipynb_checkpoints/
